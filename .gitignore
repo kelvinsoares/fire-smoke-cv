@@ -9,5 +9,10 @@ runs/
 *.pt
 *.onnx
 
+results/predictions/
+results/metrics/
+models/*.pt
+data/
+
 .env
 .DS_Store
