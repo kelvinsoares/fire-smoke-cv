@@ -1,20 +1,20 @@
 .venv/
+
 __pycache__/
 *.pyc
-.ipynb_checkpoints/
 
-data/raw/
-data/processed/
+data/
+
 runs/
-*.pt
+experiments/
+
+models/*.pt
 *.onnx
 
 results/predictions/
 results/metrics/
-models/*.pt
-data/
+
+.DS_Store
 
 .env
-.DS_Store
-models/
-sample_predictions/
+.python-version

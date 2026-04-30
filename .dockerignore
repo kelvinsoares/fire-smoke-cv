@@ -1,0 +1,10 @@
+.venv
+__pycache__
+*.pyc
+data
+runs
+experiments
+results/predictions
+results/metrics
+.git
+.gitignore

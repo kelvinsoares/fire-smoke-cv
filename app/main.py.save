@@ -1,0 +1,75 @@
+
+from pathlib import Path
+from typing import Any
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from PIL import Image
+from ultralytics import YOLO
+
+MODEL_Pdef load_model() -> Non            f"Modelo não encontrado em {    model = YOLO(str(MODEL_PATH))
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "message": "FireSmokeVision API is running",
+        "docs": "/docs",
+        "health": "/health",
+        "predict": "/predict",
+    }
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.post("/predict")
+async def predict(
+    file: UploadFile = File(...),
+    confidence: float = 0.25,
+) -> dict[str, Any]:
+    if model is None:
+        raise HTTPException(status_code=500, detail="Model not loaded")
+
+    if file.content_type not in {"image/jpeg", "image/png", "image/jpg"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Formato inválido. Envie uma imagem JPEG ou PNG.",
+        )
+
+    image_bytes = await file.read()
+
+    try:
+        image = Image.open(BytesIO(image_bytes)).convert("RGB")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Imagem inválida") from exc
+
+    results = model.predict(image, conf=confidence, verbose=False)
+    result = results[0]
+
+    detections = []
+
+    for box in result.boxes:
+        class_id = int(box.cls[0])
+        class_name = model.names[class_id]
+        conf = float(box.conf[0])
+        x1, y1, x2, y2 = box.xyxy[0].tolist()
+
+        detections.append(
+            {
+                "class_id": class_id,
+                "class_name": class_name,
+                "confidence": round(conf, 4),
+                "bbox": {
+                    "x1": round(x1, 2),
+                    "y1": round(y1, 2),
+                    "x2": round(x2, 2),
+                    "y2": round(y2, 2),
+                },
+            }
+        )
+
+    return {
+        "filename": file.filename,
+        "content_type": file.conte
